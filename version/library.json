@@ -1,0 +1,22 @@
+{
+	"apps":[
+		{
+	    "title":"MX Player",
+	    "pkg":"com.mxtech.videoplayer.ad",
+	    "url":"http://www.zelaznog.net/library/mxplayer-beta.apk",
+	    "version":"1.8.4.nightly.20160125"
+	    },
+		{
+	    "title":"MX Player Codecs",
+	    "pkg":"com.mxtech.ffmpeg.v7_vfpv3d16",
+	    "url":"http://www.zelaznog.net/library/mxplayer-codecs.apk",
+	    "version":"1.7.39"
+	    },
+		{
+	    "title":"Zelaznog Library",
+	    "pkg":"net.zelaznog.library",
+	    "url":"http://www.zelaznog.net/library/library-1.0.0129.apk",
+	    "version":"1.0.0129"
+	    }
+    ]
+}

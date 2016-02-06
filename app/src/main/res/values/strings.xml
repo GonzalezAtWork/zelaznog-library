@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Zelaznog Library</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Update Database</string>
+    <string name="action_reset">Reset Database</string>
+    <string name="action_quit">Sair</string>
+    <string name="action_update">Update APP</string>
+    <string name="action_movies">Filmes</string>
+    <string name="action_series">Seriados</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_make_database">Zelaznog Library</string>
+</resources>

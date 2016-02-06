@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.zelaznog.library.MakeDatabase">
+    <item android:id="@+id/action_movies" android:title="@string/action_movies"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
+    <item android:id="@+id/action_series" android:title="@string/action_series"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/bitrate500"
+            android:title="500kbps" />
+        <item android:id="@+id/bitrate1500"
+            android:title="1500kbps" />
+        <item android:id="@+id/bitrateMAX" android:checked="true"
+            android:title="MAX" />
+    </group>
+    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_reset" android:title="@string/action_reset"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_update" android:title="@string/action_update"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_quit" android:title="@string/action_quit"
+        android:orderInCategory="100" app:showAsAction="never" />
+</menu>
