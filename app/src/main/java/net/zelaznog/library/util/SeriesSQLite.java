@@ -35,37 +35,53 @@ public class SeriesSQLite extends DBSQLite {
     }
 
     public void addSerie(VideoCategory serie){
-        ContentValues values = new ContentValues();
         long SerieID = 0;
         long SeasonID = 0;
-        for(String ble : VideoCategory.COLUMNS){
-            try {
-                Class<?> c = serie.getClass();
-                Field f = c.getDeclaredField(ble);
-                f.setAccessible(true);
-                String val = (String) f.get(serie);
-                values.put(ble, val );
-            }catch (Exception e){
-                Log.e("zelaznog", e.toString());
+        serie.name = cleanSeriesName(serie.name);
+        String findSerieId = findSerie(serie.name);
+        if( findSerieId.equals("") ) {
+            ContentValues values = new ContentValues();
+            for (String ble : VideoCategory.COLUMNS) {
+                try {
+                    Class<?> c = serie.getClass();
+                    Field f = c.getDeclaredField(ble);
+                    f.setAccessible(true);
+                    String val = (String) f.get(serie);
+                    values.put(ble, val);
+                } catch (Exception e) {
+                    Log.e("zelaznog", e.toString());
+                }
             }
+            SerieID = db.insert("zelaznog_series", null, values);
+        }else{
+            SerieID = Long.parseLong(findSerieId);
         }
-        SerieID = db.insert("zelaznog_series", null, values);
         for (VideoCollection season : serie.seasons){
-            ContentValues dbSeason = new ContentValues();
-            dbSeason.put("name", cleanSeasonName(season.name,false) );
-            dbSeason.put("serie_id", String.valueOf(SerieID) );
-            String imgPath = "http://thetvdb.com/banners/seasons/" + serie.tvdbId + "-"+ cleanSeasonName(season.name, true) +".jpg";
-            dbSeason.put("image_url", imgPath);
-            SeasonID = db.insert("zelaznog_series_seasons", null, dbSeason);
+            String findSeasonId = findSeason(cleanSeasonName(season.name,false), SerieID);
+            if( findSeasonId.equals("") ) {
+                ContentValues dbSeason = new ContentValues();
+                dbSeason.put("name", cleanSeasonName(season.name, false));
+                dbSeason.put("serie_id", String.valueOf(SerieID));
+                String imgPath = "http://thetvdb.com/banners/seasons/" + serie.tvdbId + "-" + cleanSeasonName(season.name, true) + ".jpg";
+                dbSeason.put("image_url", imgPath);
+                SeasonID = db.insert("zelaznog_series_seasons", null, dbSeason);
+            }else{
+                SeasonID = Long.parseLong(findSeasonId);
+            }
             for (Video episode : season.files){
-                ContentValues dbFiles = new ContentValues();
-                episode.name = cleanEpisodeName(episode.name);
-                dbFiles.put("name",  episode.name);
-                dbFiles.put("link", episode.link );
-                dbFiles.put("serie_id", String.valueOf(SerieID) );
-                dbFiles.put("season_id", String.valueOf(SeasonID) );
-                dbFiles.put("image_url", episode.image_url);
-                db.insert("zelaznog_series_episodes", null, dbFiles);
+                String findEpisodeId = findEpisode(episode.link);
+                if ( findEpisodeId.equals("") ) {
+                    ContentValues dbFiles = new ContentValues();
+                    episode.name = cleanEpisodeName(episode.name);
+                    dbFiles.put("name", episode.name);
+                    dbFiles.put("link", episode.link);
+                    dbFiles.put("serie_id", String.valueOf(SerieID));
+                    dbFiles.put("season_id", String.valueOf(SeasonID));
+                    dbFiles.put("image_url", episode.image_url);
+                    db.insert("zelaznog_series_episodes", null, dbFiles);
+                }else{
+                    Log.e("zelaznog","Episode already exists: " + episode.name);
+                }
             }
         }
     }
@@ -123,7 +139,75 @@ public class SeriesSQLite extends DBSQLite {
         }
         return seasons;
     }
+    public String findSeason(String name, Long SerieId){
+        String query = "SELECT  * FROM zelaznog_series_seasons where name = '"+ name +"' and serie_id = '"+ String.valueOf(SerieId) +"'";
+        String ret = "";
+        try {
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                VideoCollection season = new VideoCollection();
+                season.id = cursor.getString(0);
+                season.name = cursor.getString(1);
+                season.serie_id = cursor.getString(2);
+                season.image_url = cursor.getString(3);
+                ret = season.id;
+            }
+        } catch(Exception e){
+            Log.e("zelaznog",e.toString());
+        }
+        return ret;
+    }
+    public String findSerie(String name){
+        String query = "SELECT  * FROM zelaznog_series where name = '"+ name +"'";
+        String ret = "";
+        try {
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                Object serie = new VideoCategory();
+                Class<?> c = serie.getClass();
+                int conter = 0;
+                for (String ble : VideoCategory.COLUMNS) {
+                    Field f = c.getDeclaredField(ble);
+                    f.setAccessible(true);
+                    String val = cursor.getString(conter);
+                    f.set(serie, val);
+                    conter++;
+                }
+                Field f = c.getDeclaredField("id");
+                f.setAccessible(true);
+                String val = cursor.getString(conter);
+                f.set(serie, val);
+                ret = ((VideoCategory) serie).id;
+            }
+        } catch(Exception e){
+            Log.e("zelaznog",e.toString());
+        }
+        return ret;
+    }
 
+    public String findEpisode(String link){
+        String query = "SELECT  * FROM zelaznog_series_episodes where link = '"+ link +"'";
+        String ret = "";
+        try {
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                Video video = new Video();
+                video.id = cursor.getString(0);
+                video.name = cursor.getString(1);
+                video.link = cursor.getString(2);
+                video.serie_id = cursor.getString(3);
+                video.season_id = cursor.getString(4);
+                video.description = cursor.getString(5);
+                video.image_url = cursor.getString(6);
+                video.duration = cursor.getString(7);
+                video.position = cursor.getString(8);
+                ret = video.id;
+            }
+        } catch(Exception e){
+            Log.e("zelaznog",e.toString());
+        }
+        return ret;
+    }
     public ArrayList<VideoCategory> getAllSeries() {
         ArrayList<VideoCategory> series = new ArrayList<VideoCategory>();
         String query = "SELECT  * FROM zelaznog_series order by name";
@@ -159,6 +243,12 @@ public class SeriesSQLite extends DBSQLite {
         return series;
     }
 
+    private String cleanSeriesName(String name){
+        String seriesName = "";
+        seriesName = name.replace("'", "");
+        return seriesName;
+    }
+
     private String cleanSeasonName(String name, Boolean numeric){
         String seasonName = "";
         for (int i = 0; i < 99; i++){
@@ -174,6 +264,7 @@ public class SeriesSQLite extends DBSQLite {
         }
         return name;
     }
+
     private String cleanEpisodeName(String name){
         String seasonName = "";
         for (int i = 0; i < 99; i++){

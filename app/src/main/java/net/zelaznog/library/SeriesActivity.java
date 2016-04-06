@@ -71,6 +71,7 @@ public class SeriesActivity extends BaseActivity {
                 playVideo(response);
             }
         };
+        //getReal(cloudURL);
         getJson(cloudURL);
     }
 
@@ -83,7 +84,6 @@ public class SeriesActivity extends BaseActivity {
 
     public void buildDb(){
         showMsg("Updating Series Database...");
-        ringProgressDialog.dismiss();
         Intent intent = new Intent(activity, SeriesActivity.class);
         startActivity(intent);
         finalizar();
@@ -145,9 +145,9 @@ public class SeriesActivity extends BaseActivity {
             if(img == "null"){
                 //Log.v("zelaznog",jsonPrettyPrintString);
             }
-            support.image_url = "http://thetvdb.com/banners/"+ img;
+            //support.image_url = "http://thetvdb.com/banners/"+ img;
             support.imdbId = TVDBModel.Data.Series.get(0).IMDB_ID;
-            support.tvdbId = TVDBModel.Data.Series.get(0).seriesid;
+            //support.tvdbId = TVDBModel.Data.Series.get(0).seriesid;
         }catch(Exception e){
             //Log.v("zelaznog",jsonPrettyPrintString);
             Log.e("Zelaznog",e.toString());

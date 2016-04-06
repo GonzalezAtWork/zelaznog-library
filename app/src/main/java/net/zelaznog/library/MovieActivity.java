@@ -46,7 +46,9 @@ public class MovieActivity extends BaseActivity {
                 playVideo(response);
             }
         };
-        showMsg("Watching", currentVideo.name + "\nBitrate: " + bitrate);
+        strMsg = currentVideo.name;
+        showMsg("Watching", strMsg);
+        //getReal(cloudURL);
         getJson(cloudURL);
     }
 

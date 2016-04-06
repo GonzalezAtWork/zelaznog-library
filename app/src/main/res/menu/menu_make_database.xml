@@ -16,6 +16,10 @@
         <item android:id="@+id/bitrateMAX" android:checked="true"
             android:title="MAX" />
     </group>
+    <group android:checkableBehavior="all">
+        <item android:id="@+id/useProxy"
+            android:title="Use Proxy" android:checkable="true"/>
+    </group>
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_reset" android:title="@string/action_reset"
