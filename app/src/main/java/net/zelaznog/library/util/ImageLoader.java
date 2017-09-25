@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import net.zelaznog.library.R;
@@ -76,8 +77,10 @@ public class ImageLoader {
             Utils.CopyStream(is, os);
             os.close();
             bitmap = decodeFile(f);
+            conn.disconnect();
             return bitmap;
         } catch (Throwable ex){
+            Log.e("zelaznog",ex.getMessage());
             ex.printStackTrace();
             if(ex instanceof OutOfMemoryError)
                 memoryCache.clear();
@@ -108,8 +111,12 @@ public class ImageLoader {
             //decode with inSampleSize
             BitmapFactory.Options o2 = new BitmapFactory.Options();
             o2.inSampleSize=scale;
-            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
-        } catch (FileNotFoundException e) {}
+            FileInputStream fis = new FileInputStream(f);
+            Bitmap bmp = BitmapFactory.decodeStream(fis, null, o2);
+            return bmp;
+        } catch (FileNotFoundException e) {
+            Log.e("zelaznog", e.getMessage());
+        }
         return null;
     }
 

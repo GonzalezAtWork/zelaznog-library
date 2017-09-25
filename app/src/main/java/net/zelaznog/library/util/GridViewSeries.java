@@ -27,13 +27,15 @@ public class GridViewSeries extends ArrayAdapter {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
-        imgLoader = new ImageLoader(context);
+        imgLoader = new ImageLoader(context.getApplicationContext());
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ViewHolder holder = null;
+        String holderTitle = "";
+        String holderImage = "";
 
         if (row == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
@@ -48,12 +50,12 @@ public class GridViewSeries extends ArrayAdapter {
 
         Object item = data.get(position);
         if(item instanceof VideoCategory) {
-            holder.imageTitle.setText(((VideoCategory) item).name);
-            imgLoader.DisplayImage(((VideoCategory) item).image_url, holder.image);
+            holderTitle = ((VideoCategory) item).name;
+            holderImage = ((VideoCategory) item).image_url;
         }
         if(item instanceof VideoCollection) {
-            holder.imageTitle.setText(((VideoCollection) item).name);
-            imgLoader.DisplayImage(((VideoCollection) item).image_url, holder.image);
+            holderTitle = ((VideoCollection) item).name;
+            holderImage = ((VideoCollection) item).image_url;
         }
         if(item instanceof Video) {
             Video ble = (Video)item;
@@ -69,9 +71,11 @@ public class GridViewSeries extends ArrayAdapter {
                     Log.e("zelaznog", e.toString());
                 }
             }
-            holder.imageTitle.setText(title);
-            imgLoader.DisplayImage(((Video) item).image_url, holder.image);
+            holderTitle = title;
+            holderImage = ((Video) item).image_url;
         }
+        holder.imageTitle.setText(holderTitle);
+        imgLoader.DisplayImage(holderImage, holder.image);
         return row;
     }
 

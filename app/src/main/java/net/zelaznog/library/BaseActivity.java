@@ -1,12 +1,16 @@
 package net.zelaznog.library;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -353,16 +357,39 @@ public class BaseActivity extends ActionBarActivity {
                 }
             }).start();
             */
+            ringProgressDialog.dismiss();
         }catch(Exception e){
             Log.e("zelaznog",e.toString());
         }
-        ringProgressDialog.dismiss();
+    }
+
+    public void loadHistory(String query, Menu menu) {
+        Log.d("zelaznog",query);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_make_database, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+        final Menu bla = menu;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String query) {
+                loadHistory(query, bla);
+                return true;
+            }
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                loadHistory(query, bla);
+                return true;
+            }
+        });
+
         MenuItem _useProxy = (MenuItem) menu.findItem(R.id.useProxy);
         if (useProxy) {
             _useProxy.setChecked(true);
@@ -451,8 +478,8 @@ public class BaseActivity extends ActionBarActivity {
                 editor.putString("bitrate", bitrate);
                 break;
             case R.id.useProxy:
-                item.setChecked(true);
-                useProxy = true;
+                useProxy = (!useProxy);
+                item.setChecked(useProxy);
                 editor.putBoolean("useProxy", useProxy);
                 break;
             case R.id.action_update:

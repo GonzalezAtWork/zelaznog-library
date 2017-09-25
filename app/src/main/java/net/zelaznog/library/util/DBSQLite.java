@@ -35,7 +35,8 @@ public class DBSQLite extends SQLiteOpenHelper {
                     "original_title TEXT, " +
                     "image_url TEXT, " +
                     "duration TEXT, " +
-                    "position TEXT )";
+                    "position TEXT, " +
+                    "overview TEXT  )";
             db.execSQL(_sql);
 
             _sql = " CREATE TABLE zelaznog_series ( ";

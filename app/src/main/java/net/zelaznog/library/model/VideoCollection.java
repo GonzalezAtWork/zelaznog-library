@@ -9,4 +9,9 @@ public class VideoCollection {
     public String name;
     public String image_url;
     public ArrayList<Video> files;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

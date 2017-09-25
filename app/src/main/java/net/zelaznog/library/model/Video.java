@@ -14,6 +14,9 @@ public class Video {
     public String image64;
     public String season_id;
     public String description;
+    public String overview;
+    public String themoviedb_id;
+    public String date;
     public String serie_id;
     public Bitmap image;
     public Boolean fixed = false;
@@ -26,6 +29,21 @@ public class Video {
     }
     @Override
     public String toString() {
-        return "Video [id=" + id + ", name=" + name + ", year=" + year + ", link=" + link + "]";
+        //return "Video [id=" + id + ", name=" + name + ", year=" + year + ", link=" + link + "]";
+        String ano = year;
+        if(ano != null){
+            ano = year.split("-")[0];
+        }else{
+            ano = "";
+        }
+        String original = original_title;
+        if (original == null || original.equals(name) ){
+            original = "";
+        }
+        if(original.equals("") || ano.equals("") ){
+            return " " + name + " (" + original +  ano +")";
+        }else{
+            return " " + name + " (" + original +" - "+  ano +")";
+        }
     }
 }

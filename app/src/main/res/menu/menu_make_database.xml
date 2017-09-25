@@ -2,6 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="net.zelaznog.library.MakeDatabase">
+    <item android:id="@+id/search"
+        android:title="@string/search_title"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item android:id="@+id/action_movies" android:title="@string/action_movies"
         android:orderInCategory="100"
         app:showAsAction="always"/>

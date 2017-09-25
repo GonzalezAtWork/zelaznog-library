@@ -1,9 +1,12 @@
 package net.zelaznog.library;
 
 import android.content.Intent;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Menu;
 
 import net.zelaznog.library.model.TVDB;
 import net.zelaznog.library.model.Video;
@@ -15,11 +18,29 @@ import net.zelaznog.library.util.SeriesSQLite;
 import org.json.XML;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class SeriesActivity extends BaseActivity {
 
     public int layout = R.layout.activity_series;
 
     public VideoCategory support;
+
+    @Override
+    public void loadHistory(String query, Menu menu) {
+        String[] columns = new String[] { "_id", "text"};
+        MatrixCursor cursor = new MatrixCursor(columns);
+        ArrayList<VideoCategory> series = dbSeries.getAllSeries();
+        for(int i = 0; i < series.size(); i++) {
+            String label = series.get(i).toString();
+            if(label.toLowerCase().indexOf(query.toLowerCase()) > 0) {
+                cursor.addRow( new Object[] { i, label } );
+            }
+        }
+        final SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
+        SearchAdapter adapter = new SearchAdapter(this, cursor, series);
+        search.setSuggestionsAdapter(adapter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +105,8 @@ public class SeriesActivity extends BaseActivity {
 
     public void buildDb(){
         showMsg("Updating Series Database...");
+        dbSeries.removeLinks(dbmodel.Series);
+        ringProgressDialog.dismiss();
         Intent intent = new Intent(activity, SeriesActivity.class);
         startActivity(intent);
         finalizar();
@@ -104,9 +127,11 @@ public class SeriesActivity extends BaseActivity {
         }
     }
 
+    public int counter = 0;
     public void getAPIJson(){
+        counter++;
         String query = support.name;
-        showMsg("Crawling data ...", query);
+        showMsg("Crawling: "+ counter +"/"+ dbmodel.Series.size() +" Series", query);
         query = query.replace("."," ");
         query = query.replace(" ","%20");
         cloudURL = "http://thetvdb.com/api/GetSeries.php?language=pt&seriesname=" + query;

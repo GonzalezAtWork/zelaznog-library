@@ -21,6 +21,8 @@ public class SeriesSQLite extends DBSQLite {
     public SeriesSQLite(ActionBarActivity context) {
         super(context);
     }
+    private static final String TABLE_NAME = "zelaznog_series_episodes";
+    private static final String KEY_LINK = "link";
 
     @Override
     public void updateEpisode(Video episode) {
@@ -28,12 +30,51 @@ public class SeriesSQLite extends DBSQLite {
             ContentValues cv = new ContentValues();
             cv.put("position", episode.position);
             cv.put("duration",episode.duration);
-            db.update("zelaznog_series_episodes", cv, "id="+ String.valueOf(episode.id), null);
+            db.update(TABLE_NAME, cv, "id="+ String.valueOf(episode.id), null);
         } catch(Exception e){
             Log.e("zelaznog",e.toString());
         }
     }
 
+    public boolean checkLink(String _link){
+        boolean retorno = false;
+        String query = "SELECT  * FROM " + TABLE_NAME + " where "+ KEY_LINK +" = '"+ _link +"' ";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            Log.v("zelaznog","Exists: " + _link);
+            retorno = true;
+        }
+        return retorno;
+    }
+    public void removeLinks( ArrayList<VideoCategory> series){
+        String query = "SELECT  * FROM " + TABLE_NAME + " ";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Video video = new Video();
+                video.id = cursor.getString(0);
+                video.name = cursor.getString(1);
+                video.link = cursor.getString(3);
+                boolean remove = true;
+                for (VideoCategory serie : series){
+                    for (VideoCollection season : serie.seasons){
+                        for (Video checkVideo : season.files){
+                            if(video.link.equals( checkVideo.link )){
+                                remove = false;
+                            }
+                        }
+                    }
+                }
+                if(remove){
+                    try {
+                        db.execSQL("DELETE FROM " + TABLE_NAME + " where link = '"+ video.link +"'");
+                    } catch(Exception e){
+                        Log.e("zelaznog", e.toString());
+                    }
+                }
+            } while (cursor.moveToNext());
+        }
+    }
     public void addSerie(VideoCategory serie){
         long SerieID = 0;
         long SeasonID = 0;
@@ -78,7 +119,7 @@ public class SeriesSQLite extends DBSQLite {
                     dbFiles.put("serie_id", String.valueOf(SerieID));
                     dbFiles.put("season_id", String.valueOf(SeasonID));
                     dbFiles.put("image_url", episode.image_url);
-                    db.insert("zelaznog_series_episodes", null, dbFiles);
+                    db.insert(TABLE_NAME, null, dbFiles);
                 }else{
                     Log.e("zelaznog","Episode already exists: " + episode.name);
                 }
@@ -88,7 +129,7 @@ public class SeriesSQLite extends DBSQLite {
 
     public ArrayList<Video> getAllEpisodes(VideoCollection season) {
         ArrayList<Video> episodes = new ArrayList<Video>();
-        String query = "SELECT  * FROM zelaznog_series_episodes where season_id = '"+ String.valueOf(season.id) +"' and serie_id = '"+ String.valueOf(season.serie_id) +"' order by name";
+        String query = "SELECT  * FROM "+ TABLE_NAME +" where season_id = '"+ String.valueOf(season.id) +"' and serie_id = '"+ String.valueOf(season.serie_id) +"' order by name";
         try {
             Cursor cursor = db.rawQuery(query, null);
             if (cursor.moveToFirst()) {
@@ -186,7 +227,7 @@ public class SeriesSQLite extends DBSQLite {
     }
 
     public String findEpisode(String link){
-        String query = "SELECT  * FROM zelaznog_series_episodes where link = '"+ link +"'";
+        String query = "SELECT  * FROM "+ TABLE_NAME +" where link = '"+ link +"'";
         String ret = "";
         try {
             Cursor cursor = db.rawQuery(query, null);

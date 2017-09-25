@@ -23,13 +23,15 @@ public class GridViewMovies extends ArrayAdapter {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
-        imgLoader = new ImageLoader(context);
+        imgLoader = new ImageLoader(context.getApplicationContext());
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ViewHolder holder = null;
+        String holderTitle = "";
+        String holderImage = "";
 
         if (row == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
@@ -41,11 +43,12 @@ public class GridViewMovies extends ArrayAdapter {
         } else {
             holder = (ViewHolder) row.getTag();
         }
-
         Video item = (Video) data.get(position);
-        holder.imageTitle.setText(item.name);
+        holderTitle = item.name;
+        holderImage = item.image_url;
 
-        imgLoader.DisplayImage(item.image_url, holder.image);
+        holder.imageTitle.setText(holderTitle);
+        imgLoader.DisplayImage(holderImage, holder.image);
         return row;
     }
 
